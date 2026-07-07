@@ -15,15 +15,15 @@ export class Activity {
   @JoinColumn({ name: 'student_id' })
   student: Student;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, name: 'activity_type' })
   activityType: string;
 
   @Column({ type: 'integer' })
   count: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }

@@ -8,18 +8,18 @@ export class Session {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'integer', unique: true })
+  @Column({ type: 'integer', unique: true, name: 'session_number' })
   @Index('idx_session_number')
   sessionNumber: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', name: 'session_date' })
   @Index('idx_session_date')
   sessionDate: Date;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
   @OneToMany(() => Activity, activity => activity.session)

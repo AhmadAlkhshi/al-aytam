@@ -22,9 +22,9 @@ export class Attendance {
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }
