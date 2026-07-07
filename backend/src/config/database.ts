@@ -16,15 +16,23 @@ dotenv.config();
  * - Supports DATABASE_URL (injected by Render) or individual DB_* vars
  */
 
-// If DATABASE_URL is set (e.g., on Render), use it; otherwise use individual vars
+// If DATABASE_URL is set (e.g., on Render/Supabase), use it; otherwise use individual vars
 const databaseUrl = process.env.DATABASE_URL;
+
+// Strip sslmode query param from URL — we handle SSL via the ssl option below
+const cleanDatabaseUrl = databaseUrl
+  ? databaseUrl.replace(/[?&]sslmode=[^&]*/g, '').replace(/\?$/, '')
+  : undefined;
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
 
-  // Use DATABASE_URL when available (Render injects this automatically)
-  ...(databaseUrl
-    ? { url: databaseUrl, ssl: { rejectUnauthorized: false } }
+  // Use DATABASE_URL when available (Supabase/Render injects this automatically)
+  ...(cleanDatabaseUrl
+    ? {
+        url: cleanDatabaseUrl,
+        ssl: { rejectUnauthorized: false },
+      }
     : {
         host: process.env.DB_HOST || 'localhost',
         port: parseInt(process.env.DB_PORT || '5432', 10),
