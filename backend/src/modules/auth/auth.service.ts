@@ -4,11 +4,13 @@ import AppDataSource from '../../config/database';
 import { User, UserRole } from './user.entity';
 import { AppError } from '../../shared/middleware/error.middleware';
 
-const userRepository = AppDataSource.getRepository(User);
-
 export class AuthService {
+  private get userRepository() {
+    return AppDataSource.getRepository(User);
+  }
+
   async login(username: string, password: string) {
-    const user = await userRepository.findOne({ where: { username } });
+    const user = await this.userRepository.findOne({ where: { username } });
     
     if (!user) {
       throw new AppError('اسم المستخدم أو كلمة المرور غير صحيحة', 401, 'INVALID_CREDENTIALS');
@@ -33,7 +35,7 @@ export class AuthService {
 
     // Update last login
     user.lastLoginAt = new Date();
-    await userRepository.save(user);
+    await this.userRepository.save(user);
 
     return {
       token,
@@ -47,7 +49,7 @@ export class AuthService {
   }
 
   async createUser(username: string, password: string, fullName: string, role: UserRole = UserRole.TEACHER) {
-    const existingUser = await userRepository.findOne({ where: { username } });
+    const existingUser = await this.userRepository.findOne({ where: { username } });
     
     if (existingUser) {
       throw new AppError('اسم المستخدم موجود مسبقاً', 400, 'USERNAME_EXISTS');
@@ -55,14 +57,14 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    const user = userRepository.create({
+    const user = this.userRepository.create({
       username,
       password: hashedPassword,
       fullName,
       role
     });
 
-    await userRepository.save(user);
+    await this.userRepository.save(user);
 
     return {
       id: user.id,
