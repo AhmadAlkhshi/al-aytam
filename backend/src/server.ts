@@ -23,8 +23,22 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
+
+// Build allowed origins list from CORS_ORIGIN env var
+// Supports comma-separated list: https://app.vercel.app,https://app2.vercel.app
+const rawOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const allowedOrigins = rawOrigin.split(',').map(o => o.trim());
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Render health checks)
+    if (!origin) return callback(null, true);
+    // Allow if exact match
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Allow any *.vercel.app subdomain
+    if (/^https:\/\/[^.]+\.vercel\.app$/.test(origin)) return callback(null, true);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
   credentials: true
 }));
 app.use(compression());
