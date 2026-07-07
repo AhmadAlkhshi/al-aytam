@@ -79,6 +79,8 @@ const AppDataSource = new DataSource(dataSourceOptions);
 export const initializeDatabase = async (): Promise<DataSource> => {
   try {
     if (!AppDataSource.isInitialized) {
+      console.log('→ Attempting DB connection...');
+      console.log('→ DATABASE_URL set:', !!process.env.DATABASE_URL);
       await AppDataSource.initialize();
       logger.info('✓ Database connection established successfully');
       logger.info(`✓ Connected to PostgreSQL at ${process.env.DB_HOST}:${process.env.DB_PORT}`);
@@ -88,6 +90,7 @@ export const initializeDatabase = async (): Promise<DataSource> => {
     return AppDataSource;
   } catch (error) {
     logger.error('✗ Failed to connect to database:', error);
+    console.error('✗ DB CONNECTION ERROR:', error);
     
     // Provide helpful error messages for common issues
     if (error instanceof Error) {
